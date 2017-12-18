@@ -20,95 +20,88 @@ local engine = lovetoys.Engine()
 
 
 function create_tile(targetEngine, imageFile, quad, x, y, z)
-	local tile = lovetoys.Entity()
+  local tile = lovetoys.Entity()
   tile:initialize()
-	tile:add(Position(x, y, z))
-	tile:add(DrawSprite(imageFile, quad, 32, 32))
-	targetEngine:addEntity(tile)
-	return tile
+  tile:add(Position(x, y, z))
+  tile:add(DrawSprite(imageFile, quad, 32, 32))
+  targetEngine:addEntity(tile)
+  return tile
 end
 
 
 function create_tile_grid(engine)
-	local imageFile = love.graphics.newImage("assets/glow_tile.png")
- 	local tile = love.graphics.newQuad(0, 0, 64, 64, imageFile:getDimensions())
+  local imageFile = love.graphics.newImage("assets/glow_tile.png")
+   local tile = love.graphics.newQuad(0, 0, 64, 64, imageFile:getDimensions())
 
-	N = 5
-	M = 5
+  N = 5
+  M = 5
 
-	map = {}
-	for i=1,N do
-		map[i] = {}
-		for j=1,M do
-			map[i][j] = 1
-			create_tile(engine, imageFile, tile, 
-									64*(i-1), 64*(j-1), 0)
-		end
-	end
+  map = {}
+  for i=1,N do
+    map[i] = {}
+    for j=1,M do
+      map[i][j] = 1
+      create_tile(engine, imageFile, tile, 
+                  64*(i-1), 64*(j-1), 0)
+    end
+  end
 end
 
 
 function love.load()
-	--sound = love.audio.newSource("assets/Only Human.mp3")
-	--sound:play()
+  --sound = love.audio.newSource("assets/Only Human.mp3")
+  --sound:play()
 
-	create_tile_grid(engine)
+  create_tile_grid(engine)
 
-	local car = lovetoys.Entity()
+  local car = lovetoys.Entity()
   car:initialize()
-	car:add(Position(0, 0, 0))
-	car:add(Controllable())
-	car:add(DrawCircle(10, 255, 255, 255))
-	engine:addEntity(car)
+  car:add(Position(0, 0, 0))
+  car:add(Controllable())
+  car:add(DrawCircle(10, 255, 255, 255))
+  engine:addEntity(car)
 
-	local cameraman = lovetoys.Entity()
+  local cameraman = lovetoys.Entity()
   cameraman:initialize()
-	cameraman:add(Position(0, 0, 0))
-	cameraman:add(Cameraman(0, 0,
-													love.graphics.getWidth(),
-								          love.graphics.getHeight()))
-	--cameraman:add(FollowParent("Simple"))
-	cameraman:add(FollowParent("PositionPID", {kp=0.02, ki=0.02, kd=0.002}))
-	
-	cameraman:setParent(car)
-	engine:addEntity(cameraman)
+  cameraman:add(Position(0, 0, 0))
+  cameraman:add(Cameraman(0, 0,
+                          love.graphics.getWidth(),
+                          love.graphics.getHeight()))
+  --cameraman:add(FollowParent("Simple"))
+  cameraman:add(FollowParent("PositionPID", {kp=0.02, ki=0.02, kd=0.002}))
+  
+  cameraman:setParent(car)
+  engine:addEntity(cameraman)
 
-	engine:addSystem(SysControlMove(Input))
-	engine:addSystem(SysFollowParent())
+  engine:addSystem(SysControlMove(Input))
+  engine:addSystem(SysFollowParent())
 
-	engine:addSystem(SysDrawSprite(camera))
-	engine:addSystem(SysDrawCircle(camera))
+  engine:addSystem(SysDrawSprite(camera))
+  engine:addSystem(SysDrawCircle(camera))
 
 end
-
-
-function follow(target, follower, dt)
-	follower.pos = Util.copy(target.pos)
-end
-
 
 
 function love.update(dt)
-	engine:update(dt)
-	Input.update_timers(dt)
+  engine:update(dt)
+  Input.update_timers(dt)
 end
 
 
-
 function love.draw()
-	engine:draw(dt)
+  engine:draw(dt)
 end
 
 
 function love.keypressed(key, scan, isrepeat)
-    if key == "escape" then
-        love.event.push("quit")
-    end
+  if key == "escape" then
+    love.event.push("quit")
+  end
 
-    Input.press(key)
+  Input.press(key)
 end
 
 
 function love.keyreleased(key, scan)
-    Input.release(key)
+  Input.release(key)
 end
